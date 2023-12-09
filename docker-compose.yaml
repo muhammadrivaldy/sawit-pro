@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  db-users:
+    container_name: pg-users
+    image: postgres:16-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: users
