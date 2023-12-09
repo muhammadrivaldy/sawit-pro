@@ -2,7 +2,10 @@ module sawit-pro
 
 go 1.19
 
-require github.com/muhammadrivaldy/go-util v0.3.32
+require (
+	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/muhammadrivaldy/go-util v0.3.32
+)
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
