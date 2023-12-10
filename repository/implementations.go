@@ -1,11 +1,19 @@
 package repository
 
-import "context"
+import (
+	"context"
 
-func (r *Repository) GetTestById(ctx context.Context, input GetTestByIdInput) (output GetTestByIdOutput, err error) {
-	err = r.Db.QueryRowContext(ctx, "SELECT name FROM test WHERE id = $1", input.Id).Scan(&output.Name)
-	if err != nil {
-		return
-	}
-	return
+	"github.com/SawitProRecruitment/UserService/models"
+)
+
+func (r *Repository) InsertUsers(ctx context.Context, user models.User) (models.User, error) {
+
+	return models.User{}, nil
+
+}
+
+func (r *Repository) SelectUsersById(ctx context.Context, id int) (models.User, error) {
+
+	return models.User{}, nil
+
 }

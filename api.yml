@@ -11,7 +11,7 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: User Service
+  title: Users Service
   license:
     name: MIT
 servers:
@@ -23,56 +23,10 @@ paths:
       tags:
         - Users
       requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                phone_number:
-                  type: string
-                  example: "+62877823818829"
-                  minLength: 12
-                  maxLength: 15
-                full_name:
-                  type: string
-                  example: Rivaldy SBS
-                  minLength: 3
-                  maxLength: 60
-                password:
-                  type: string
-                  example: myPassword990
-                  minLength: 6
-                  maxLength: 64
-              required:
-                - phone_number
-                - full_name
-                - password
+        $ref: "#/components/requestBodies/requestRegistration"
       responses:
         "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: success
-                  data:
-                    type: object
-                    properties:
-                      user_id:
-                        type: integer
-                        example: 123
-                      phone_number:
-                        type: string
-                        example: "+62877823818829"
-                      full_name:
-                        type: string
-                        example: Rivaldy SBS
+          $ref: "#/components/responses/responseRegistration"
         "400":
           $ref: "#/components/responses/responseErrorBadRequest"
         "409":
@@ -97,12 +51,18 @@ paths:
                   code:
                     type: integer
                     example: 200
-  /users/:id:
+  /users/{id}:
     get:
       description: Endpoint for get user
       tags:
         - Users
-      parameters: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            example: 123
+          required: true
       responses:
         "200":
           description: Success
@@ -118,7 +78,13 @@ paths:
       description: Endpoint for update user
       tags:
         - Users
-      parameters: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            example: 123
+          required: true
       responses:
         "200":
           description: Success
@@ -138,7 +104,57 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
+  requestBodies:
+    requestRegistration:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            properties:
+              phone_number:
+                type: string
+                example: "+62877823818829"
+              full_name:
+                type: string
+                example: Rivaldy SBS
+              password:
+                type: string
+                example: myPassword990
+            required:
+              - phone_number
+              - full_name
+              - password
   responses:
+    responseRegistration:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: success
+              data:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 123
+                  full_name:
+                    type: string
+                    example: "Rivaldy SBS"
+                  phone_number:
+                    type: string
+                    example: "+6287700912310"
+                required:
+                  - id
+                  - full_name
+                  - phone_number
     responseSuccessOk:
       description: "Ok"
       content:

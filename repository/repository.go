@@ -5,22 +5,25 @@ import (
 	"database/sql"
 
 	_ "github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 type Repository struct {
-	Db *sql.DB
+	db     *sql.DB
+	gormDb *gorm.DB
 }
 
 type NewRepositoryOptions struct {
 	Dsn string
 }
 
-func NewRepository(opts NewRepositoryOptions) *Repository {
+func NewRepository(opts NewRepositoryOptions) RepositoryInterface {
+
 	db, err := sql.Open("postgres", opts.Dsn)
 	if err != nil {
 		panic(err)
 	}
-	return &Repository{
-		Db: db,
-	}
+
+	return &Repository{db: db, gormDb: nil}
+
 }

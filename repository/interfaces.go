@@ -4,8 +4,13 @@
 // interfaces using mockgen. See the Makefile for more information.
 package repository
 
-import "context"
+import (
+	"context"
+
+	"github.com/SawitProRecruitment/UserService/models"
+)
 
 type RepositoryInterface interface {
-	GetTestById(ctx context.Context, input GetTestByIdInput) (output GetTestByIdOutput, err error)
+	InsertUsers(ctx context.Context, user models.User) (models.User, error)
+	SelectUsersById(ctx context.Context, id int) (models.User, error)
 }

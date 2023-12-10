@@ -8,12 +8,14 @@ import (
 	"compress/gzip"
 	"encoding/base64"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
+	"github.com/oapi-codegen/runtime"
 )
 
 const (
@@ -41,6 +43,17 @@ type ResponseErrorSystem struct {
 	Message *string                 `json:"message,omitempty"`
 }
 
+// ResponseRegistration defines model for responseRegistration.
+type ResponseRegistration struct {
+	Code *int `json:"code,omitempty"`
+	Data *struct {
+		FullName    string `json:"full_name"`
+		Id          int    `json:"id"`
+		PhoneNumber string `json:"phone_number"`
+	} `json:"data,omitempty"`
+	Message *string `json:"message,omitempty"`
+}
+
 // PostUsersFormdataBody defines parameters for PostUsers.
 type PostUsersFormdataBody struct {
 	FullName    string `form:"full_name" json:"full_name"`
@@ -57,14 +70,14 @@ type ServerInterface interface {
 	// (POST /users)
 	PostUsers(ctx echo.Context) error
 
-	// (GET /users/:id)
-	GetUsersId(ctx echo.Context) error
-
-	// (PUT /users/:id)
-	PutUsersId(ctx echo.Context) error
-
 	// (POST /users/login)
 	PostUsersLogin(ctx echo.Context) error
+
+	// (GET /users/{id})
+	GetUsersId(ctx echo.Context, id int) error
+
+	// (PUT /users/{id})
+	PutUsersId(ctx echo.Context, id int) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -81,24 +94,6 @@ func (w *ServerInterfaceWrapper) PostUsers(ctx echo.Context) error {
 	return err
 }
 
-// GetUsersId converts echo context to params.
-func (w *ServerInterfaceWrapper) GetUsersId(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetUsersId(ctx)
-	return err
-}
-
-// PutUsersId converts echo context to params.
-func (w *ServerInterfaceWrapper) PutUsersId(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PutUsersId(ctx)
-	return err
-}
-
 // PostUsersLogin converts echo context to params.
 func (w *ServerInterfaceWrapper) PostUsersLogin(ctx echo.Context) error {
 	var err error
@@ -107,6 +102,38 @@ func (w *ServerInterfaceWrapper) PostUsersLogin(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PostUsersLogin(ctx)
+	return err
+}
+
+// GetUsersId converts echo context to params.
+func (w *ServerInterfaceWrapper) GetUsersId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetUsersId(ctx, id)
+	return err
+}
+
+// PutUsersId converts echo context to params.
+func (w *ServerInterfaceWrapper) PutUsersId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id int
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PutUsersId(ctx, id)
 	return err
 }
 
@@ -139,28 +166,29 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/users", wrapper.PostUsers)
+	router.POST(baseURL+"/users/login", wrapper.PostUsersLogin)
 	router.GET(baseURL+"/users/:id", wrapper.GetUsersId)
 	router.PUT(baseURL+"/users/:id", wrapper.PutUsersId)
-	router.POST(baseURL+"/users/login", wrapper.PostUsersLogin)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"AP//tptqcgoNAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

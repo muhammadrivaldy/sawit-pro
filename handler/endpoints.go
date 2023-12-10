@@ -2,17 +2,48 @@ package handler
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/SawitProRecruitment/UserService/generated"
+	"github.com/SawitProRecruitment/UserService/payload"
+	"github.com/SawitProRecruitment/UserService/utils"
 	"github.com/labstack/echo/v4"
 )
 
-// This is just a test endpoint to get you started. Please delete this endpoint.
-// (GET /hello)
-func (s *Server) Hello(ctx echo.Context, params generated.HelloParams) error {
+// (POST /users)
+func (s *Server) PostUsers(ctx echo.Context) error {
 
-	var resp generated.HelloResponse
-	resp.Message = fmt.Sprintf("Hello User %d", params.Id)
-	return ctx.JSON(http.StatusOK, resp)
+	payload := payload.RequestPostUsers{
+		PhoneNumber: ctx.FormValue("phone_number"),
+		FullName:    ctx.FormValue("full_name"),
+		Password:    ctx.FormValue("password"),
+	}
+
+	err := utils.ValidatorNew().Struct(payload)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+
+}
+
+// (GET /users/:id)
+func (s *Server) GetUsersId(ctx echo.Context) error {
+
+	return nil
+
+}
+
+// (PUT /users/:id)
+func (s *Server) PutUsersId(ctx echo.Context) error {
+
+	return nil
+
+}
+
+// (POST /users/login)
+func (s *Server) PostUsersLogin(ctx echo.Context) error {
+
+	return nil
+
 }
