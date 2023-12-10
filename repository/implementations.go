@@ -13,7 +13,6 @@ func (r *Repository) InsertUsers(ctx context.Context, user models.User) (models.
 
 func (r *Repository) UpdateUsers(ctx context.Context, user models.User) (models.User, error) {
 	err := r.gormDb.Updates(&user).Error
-	// err := r.gormDb.Model(&models.User{}).Where("id = ?", user.Id).Updates(&user).Error
 	return user, err
 }
 
