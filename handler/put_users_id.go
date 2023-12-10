@@ -49,6 +49,17 @@ func (s *Server) PutUsersId(ctx echo.Context, id int) error {
 		return err
 	}
 
+	userByPhoneNumber, err := s.repo.SelectUsersByPhoneNumber(ctx.Request().Context(), param.PhoneNumber)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		ctx.Logger().Error(err)
+		payloads.ResponseError(ctx, http.StatusInternalServerError, err, nil)
+		return err
+	} else if userByPhoneNumber.Id > 0 && user.Id != userByPhoneNumber.Id {
+		err := errors.New(strings.ToLower(http.StatusText(http.StatusConflict)))
+		payloads.ResponseError(ctx, http.StatusConflict, err, nil)
+		return err
+	}
+
 	user.FullName = param.FullName
 	user.PhoneNumber = param.PhoneNumber
 	user.UpdatedBy = null.NewInt(int64(user.Id), true)
