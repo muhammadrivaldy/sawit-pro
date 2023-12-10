@@ -13,6 +13,7 @@ func ValidatorNew() *validator.Validate {
 
 	validatorObj := validator.New()
 	validatorObj.RegisterValidation("phone-number", validateIndonesiaPhoneNumber)
+	validatorObj.RegisterValidation("password", validatePassword)
 
 	en := en.New()
 	ut := ut.New(en, en)
@@ -34,12 +35,27 @@ func validateIndonesiaPhoneNumber(fl validator.FieldLevel) bool {
 
 }
 
+func validatePassword(fl validator.FieldLevel) bool {
+
+	rgx, _ := regexp.Compile(`^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,64}$`)
+
+	return rgx.MatchString(fl.Field().String())
+
+}
+
 func translateOverride(trans ut.Translator, validatorObj *validator.Validate) {
 
 	validatorObj.RegisterTranslation("phone-number", trans, func(ut ut.Translator) error {
 		return ut.Add("phone-number", "{0} format must be valid!", true) // see universal-translator for details
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, _ := ut.T("phone-number", fe.Field())
+		return t
+	})
+
+	validatorObj.RegisterTranslation("password", trans, func(ut ut.Translator) error {
+		return ut.Add("password", "{0} format must be valid!", true) // see universal-translator for details
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("password", fe.Field())
 		return t
 	})
 
