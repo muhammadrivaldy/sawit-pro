@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	BasicAuthScopes = "basicAuth.Scopes"
+	BasicAuthScopes  = "basicAuth.Scopes"
+	BearerAuthScopes = "bearerAuth.Scopes"
 )
 
 // ResponseErrorBadRequest defines model for responseErrorBadRequest.
@@ -36,6 +37,13 @@ type ResponseErrorConflict struct {
 	Message *string                 `json:"message,omitempty"`
 }
 
+// ResponseErrorForbidden defines model for responseErrorForbidden.
+type ResponseErrorForbidden struct {
+	Code    *int                    `json:"code,omitempty"`
+	Data    *map[string]interface{} `json:"data,omitempty"`
+	Message *string                 `json:"message,omitempty"`
+}
+
 // ResponseErrorSystem defines model for responseErrorSystem.
 type ResponseErrorSystem struct {
 	Code    *int                    `json:"code,omitempty"`
@@ -43,15 +51,11 @@ type ResponseErrorSystem struct {
 	Message *string                 `json:"message,omitempty"`
 }
 
-// ResponseRegistration defines model for responseRegistration.
-type ResponseRegistration struct {
-	Code *int `json:"code,omitempty"`
-	Data *struct {
-		FullName    string `json:"full_name"`
-		Id          int    `json:"id"`
-		PhoneNumber string `json:"phone_number"`
-	} `json:"data,omitempty"`
-	Message *string `json:"message,omitempty"`
+// ResponseSuccessOk defines model for responseSuccessOk.
+type ResponseSuccessOk struct {
+	Code    *int                    `json:"code,omitempty"`
+	Data    *map[string]interface{} `json:"data,omitempty"`
+	Message *string                 `json:"message,omitempty"`
 }
 
 // PostUsersFormdataBody defines parameters for PostUsers.
@@ -116,6 +120,8 @@ func (w *ServerInterfaceWrapper) GetUsersId(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
 	}
 
+	ctx.Set(BearerAuthScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetUsersId(ctx, id)
 	return err
@@ -131,6 +137,8 @@ func (w *ServerInterfaceWrapper) PutUsersId(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
 	}
+
+	ctx.Set(BearerAuthScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PutUsersId(ctx, id)
@@ -175,20 +183,21 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+yWUY/iNhDHv0rk9q3ZS4C7HvBWrqdqpVZaLb0nhE7GHhKvEtu1J7AI5btXdsJuEgLs",
-	"Uh76cG9h4pnM/MbzH/aEqVwrCRItme6JgX8KsDhTXEDT8AiJsGgoCiWdmSmJINE9Uq0zwfyb6Pluu93e",
-	"rZXJ7wqTgWSKA3eHLEshp+5JG6XBYB1+XWTZd0lzcD/gmeY6AzIlj2JDM74L5rM5CQnutDNaNEImpAyJ",
-	"ptZuleFtp3z3UNsnk7jXLVUSvssiX4Fpu/7y63D8+fN4OBoPxuPh5Ni5DD0JYVw5i3aksFFFI7flSxC1",
-	"egKGpGxHQVNAZbFaSXvAXf34aowyM8ofK/xnkD/ZqiOnCLsWtIr9GMcvmQmJkIBxcDhF793JOSQ5WEuT",
-	"ToMeMqAWAl1gwJQxwDDY0KyAXnI9GDhYZoSurhOZUR7UF400iHgIX5RcZ4LdGMHkvyP4nSIN2CG7q+pu",
-	"h+hWPt9ZhPyWdX+6RevnKgdMhUyCbQoy2Bolk+vK/ybhWQND4AG4gpsE3ig470YwjAfnENxCnURblwbD",
-	"Ud8XL4lRHE8Gw9EgvqhFgncVqBn5WIVOtNUWjIG113VyXju7NxZYYQTu5q4lFccVtYL9VmD60ioXzltf",
-	"v5ciapfdCqgBc3zam7vH3QeFXCt3NBMMpPVlVT0jf93/7SKiQF/iNwvGBnMwG8EcqA0YW+U/+BB/iN1R",
-	"pUFSLciUjLzJ6TmmvoiocO7+kqhKkdsMvkqulZAYrJUJTPP6+rDV8z134qks+lxI2Fi4OxfyZwNrMiU/",
-	"Ra9rOWrt5KhvIXe3yDAenA5Wn4t6J60Mycc4frtzd095/8k7/b80FPDTu79ey6S/pzSxbiQquEtnqroW",
-	"ZSoR8o29q86ebNqf9esO8fi2KtUj1NcOIpkuWiO4WJbLc6z2gpcumwQukUoAA+dzBOsPqFjdcz9BhuaA",
-	"fngWe+L64KeKhIc59RLW/mcUNmCdl1JXzP++F13aIdHFJbqF5hShH/BD8QPwWcDVAJjNAUphsnppTKMo",
-	"U4xmqVOCcln+GwAA//+/3vTRAw0AAA==",
+	"H4sIAAAAAAAC/+xWUW/bNhD+KwK3t8mVbLer7bel64YAGxrE61MQFDR5lphIJHek4hiB//tAUokl2YkT",
+	"R9vy0Df5zDved/fdfbwjTJVaSZDWkNkdQfi7AmNPFBfQNJxDJoxFaoWSzsyUtCCt+6RaF4L5f5LbwWq1",
+	"GiwVloMKC5BMceDukGE5lNR9aVQa0Nbhl1VRfJO0BPcDbmmpCyAzci5uaMHX0fxkTmJi19oZjUUhM7KJ",
+	"iabGrBTytlO5Pqvt02m61y1XEr7JqlwAtl1/+nk0+fhxMhpPhpPJaLrrvIl9JQQ6OBftSHEDRSO3y4cg",
+	"anEFzJJNO4rFCoLFaCXNfbnDj8+ICk8oPw/lf6LkVyZ05LEKuxa0wL5P04fMhLSQAbricGq9dyfnmJRg",
+	"DM06DeJgqSgicGlGK1EU0QIiDoahWACPckDYW8Q9FQleOjCLnFAe1ZwjjeL4enxSclkI1nM1pj1Ug1oa",
+	"sfvsjsL9aytEF/lvCheCc5D9Qh+/HvryIbOjYG+BdSHP18ZC2SfeD30Q36gSbC5kFq1ykNEKlcyOg/5V",
+	"wq0GZoGHMWpWYF4xBsZ8ue4T/6gX/CGz4yB/ufbnDLAKhV3PXeYh2QU1gv1S2fwBkYvkrdurcmu1S2wB",
+	"FAF3T3tz97i7UMilckcLwUAajyhoDvnz9C8X0Qrr0X01gCaaA94I5hbYDaAJqQ/fpe9Sd1RpkFQLMiNj",
+	"b3Ib3+YeRFI5d98JFXZ2G/5nybUS0kZLhRE2FdWHDd+nnMzImTLW50LihiSvXcgfEZZkRn5ItsKdtFQ7",
+	"2SfZXZ0ZpcN+qTV8ilp9aL5oq/1wtHd5HZL4NJ0OR+NhelDhBe/qejPyrrb/G+NSbwEX/H2aPt78uq/J",
+	"Y48H7z99of+nhhZ9ePHt9fZuTjuZXbiy0cy4+gZ2X7oDYWySQmVCPnN4wtlHp+aP+u8O5dP/cJu2va26",
+	"Dtq9ZcZaVTjw9sHV6lmPhjdOsb5I0hKDi8vNk6S5E3zjbs3gEGUysJHz2WHN7xBIc8r9LkdagvVr/OKO",
+	"OEL6/U7ie8Xwi6H9io8brHl6QTkwb4aU3/fwMUMyfiHJWy/cV81IdwpioqtDrK80pxb2E/+s+v+J/7xK",
+	"bJ/DvUjh22nh7uprPG3D7jOAN/ddqbCo37WzJCkUo0XutHJzufknAAD//5unS2HIEQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

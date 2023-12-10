@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/SawitProRecruitment/UserService/payloads"
 	"github.com/labstack/echo/v4"
@@ -14,8 +15,8 @@ func (s *Server) GetUsersId(ctx echo.Context, id int) error {
 
 	user, err := s.repo.SelectUsersById(ctx.Request().Context(), id)
 	if err == gorm.ErrRecordNotFound {
-		ctx.Logger().Error(err)
-		payloads.ResponseError(ctx, http.StatusNotFound, errors.New("user not found"), nil)
+		err := errors.New(strings.ToLower(http.StatusText(http.StatusForbidden)))
+		payloads.ResponseError(ctx, http.StatusForbidden, err, nil)
 		return err
 	} else if err != nil {
 		ctx.Logger().Error(err)

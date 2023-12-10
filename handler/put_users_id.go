@@ -19,8 +19,8 @@ func (s *Server) PutUsersId(ctx echo.Context, id int) error {
 	userId := ctx.Get("user-id").(int)
 
 	if id != userId {
-		err := errors.New(strings.ToLower(http.StatusText(http.StatusUnprocessableEntity)))
-		payloads.ResponseError(ctx, http.StatusUnprocessableEntity, err, nil)
+		err := errors.New(strings.ToLower(http.StatusText(http.StatusForbidden)))
+		payloads.ResponseError(ctx, http.StatusForbidden, err, nil)
 		return err
 	}
 
@@ -40,8 +40,8 @@ func (s *Server) PutUsersId(ctx echo.Context, id int) error {
 
 	user, err := s.repo.SelectUsersById(ctx.Request().Context(), id)
 	if err == gorm.ErrRecordNotFound {
-		ctx.Logger().Error(err)
-		payloads.ResponseError(ctx, http.StatusNotFound, errors.New("user not found"), nil)
+		err := errors.New(strings.ToLower(http.StatusText(http.StatusForbidden)))
+		payloads.ResponseError(ctx, http.StatusForbidden, err, nil)
 		return err
 	} else if err != nil {
 		ctx.Logger().Error(err)

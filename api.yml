@@ -16,17 +16,47 @@ info:
     name: MIT
 servers:
   - url: http://localhost
+security:
+  - bearerAuth: []
 paths:
   /users:
     post:
       description: Endpoint for registration
       tags:
         - Users
+      security: []
       requestBody:
         $ref: "#/components/requestBodies/requestRegistration"
       responses:
         "201":
-          $ref: "#/components/responses/responseRegistration"
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 123
+                      full_name:
+                        type: string
+                        example: "Rivaldy SBS"
+                      phone_number:
+                        type: string
+                        example: "+6287700912310"
+                    required:
+                      - id
+                      - full_name
+                      - phone_number
         "400":
           $ref: "#/components/responses/responseErrorBadRequest"
         "409":
@@ -51,6 +81,19 @@ paths:
                   code:
                     type: integer
                     example: 200
+                  message:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: your-token-jwt
+        "400":
+          $ref: "#/components/responses/responseErrorBadRequest"
+        "500":
+          $ref: "#/components/responses/responseErrorSystem"
   /users/{id}:
     get:
       description: Endpoint for get user
@@ -74,6 +117,29 @@ paths:
                   code:
                     type: integer
                     example: 200
+                  message:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 123
+                      full_name:
+                        type: string
+                        example: "Rivaldy SBS"
+                      phone_number:
+                        type: string
+                        example: "+6287700912310"
+                    required:
+                      - id
+                      - full_name
+                      - phone_number
+        "403":
+          $ref: "#/components/responses/responseErrorForbidden"
+        "500":
+          $ref: "#/components/responses/responseErrorSystem"
     put:
       description: Endpoint for update user
       tags:
@@ -87,15 +153,13 @@ paths:
           required: true
       responses:
         "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
+          $ref: "#/components/responses/responseSuccessOk"
+        "400":
+          $ref: "#/components/responses/responseErrorBadRequest"
+        "403":
+          $ref: "#/components/responses/responseErrorForbidden"
+        "500":
+          $ref: "#/components/responses/responseErrorSystem"
 components:
   securitySchemes:
     basicAuth:
@@ -126,35 +190,6 @@ components:
               - full_name
               - password
   responses:
-    responseRegistration:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                example: 201
-              message:
-                type: string
-                example: success
-              data:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    example: 123
-                  full_name:
-                    type: string
-                    example: "Rivaldy SBS"
-                  phone_number:
-                    type: string
-                    example: "+6287700912310"
-                required:
-                  - id
-                  - full_name
-                  - phone_number
     responseSuccessOk:
       description: "Ok"
       content:
@@ -167,7 +202,7 @@ components:
                 example: 200
               message:
                 type: string
-                example: Success
+                example: success
               data:
                 type: object
                 example: null
@@ -183,7 +218,23 @@ components:
                 example: 201
               message:
                 type: string
-                example: Success
+                example: success
+              data:
+                type: object
+                example: null
+    responseErrorForbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 403
+              message:
+                type: string
+                example: forbidden
               data:
                 type: object
                 example: null
@@ -199,7 +250,7 @@ components:
                 example: 404
               message:
                 type: string
-                example: Data not found
+                example: data not found
               data:
                 type: object
                 example: null
@@ -215,7 +266,7 @@ components:
                 example: 409
               message:
                 type: string
-                example: Data conflict
+                example: data conflict
               data:
                 type: object
                 example: null
@@ -231,7 +282,7 @@ components:
                 example: 400
               message:
                 type: string
-                example: Please put correct value
+                example: detail error will be described here
               data:
                 type: object
                 example: null
@@ -247,7 +298,7 @@ components:
                 example: 401
               message:
                 type: string
-                example: Unauthorized
+                example: unauthorized
               data:
                 type: object
                 example: null
@@ -263,7 +314,7 @@ components:
                 example: 422
               message:
                 type: string
-                example: Unprocessable entity
+                example: unprocessable entity
               data:
                 type: object
                 example: null
@@ -279,7 +330,7 @@ components:
                 example: 500
               message:
                 type: string
-                example: Something when wrong
+                example: something when wrong
               data:
                 type: object
                 example: null
