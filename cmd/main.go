@@ -7,20 +7,22 @@ import (
 	"github.com/SawitProRecruitment/UserService/generated"
 	"github.com/SawitProRecruitment/UserService/handler"
 	"github.com/SawitProRecruitment/UserService/repository"
+	"github.com/SawitProRecruitment/UserService/utils"
 	"github.com/labstack/echo/v4"
 	goutil "github.com/muhammadrivaldy/go-util"
 )
 
 func main() {
 
-	config := loadConfig()
+	conf := loadConfig()
 	e := echo.New()
+	e.Use(utils.ValidateToken(conf))
 
-	repo := repository.NewRepository(config)
-	serv := handler.NewServer(repo)
+	repo := repository.NewRepository(conf)
+	serv := handler.NewServer(conf, repo)
 	generated.RegisterHandlers(e, serv)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", conf.Port)))
 
 }
 
@@ -32,11 +34,11 @@ func loadConfig() configs.Configuration {
 	}
 	defer osFile.Close()
 
-	var config configs.Configuration
-	if err := goutil.Configuration(osFile, &config); err != nil {
+	var conf configs.Configuration
+	if err := goutil.Configuration(osFile, &conf); err != nil {
 		panic(err)
 	}
 
-	return config
+	return conf
 
 }

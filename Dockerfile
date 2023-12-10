@@ -18,6 +18,7 @@ FROM alpine:latest
 # We need to copy the binary & config from the build image to the production image.
 COPY --from=Build /src/app/main /src/app/cmd/main
 COPY --from=Build /src/app/configs /src/app/configs
+COPY --from=Build /src/app/private /src/app/private
 
 WORKDIR /src/app/cmd
 

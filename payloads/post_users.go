@@ -1,7 +1,7 @@
 package payloads
 
 type RequestPostUsers struct {
-	PhoneNumber string `json:"phone_number" validate:"required,min=12,max=15"`
+	PhoneNumber string `json:"phone_number" validate:"required,phone-number,min=12,max=15"`
 	FullName    string `json:"full_name" validate:"required,min=3,max=60"`
 	Password    string `json:"password" validate:"required,password,min=6,max=64"`
 }

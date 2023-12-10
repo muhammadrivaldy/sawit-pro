@@ -25,7 +25,7 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/requestRegistration"
       responses:
-        "200":
+        "201":
           $ref: "#/components/responses/responseRegistration"
         "400":
           $ref: "#/components/responses/responseErrorBadRequest"
@@ -35,7 +35,7 @@ paths:
           $ref: "#/components/responses/responseErrorSystem"
   /users/login:
     post:
-      description: Endpoint for registration
+      description: Endpoint for login
       tags:
         - Users
       security:
@@ -135,7 +135,7 @@ components:
             properties:
               code:
                 type: integer
-                example: 200
+                example: 201
               message:
                 type: string
                 example: success

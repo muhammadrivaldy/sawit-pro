@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SawitProRecruitment/UserService/models"
 	"github.com/SawitProRecruitment/UserService/payloads"
 	"github.com/SawitProRecruitment/UserService/utils"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 // (POST /users)
@@ -19,19 +22,34 @@ func (s *Server) PostUsers(ctx echo.Context) error {
 		Password:    ctx.FormValue("password"),
 	}
 
-	err := utils.ValidatorNew().Struct(param)
+	validator := utils.NewValidation()
+
+	err := validator.ValidationStruct(param)
 	if err != nil {
 		ctx.Logger().Error(err)
+		payloads.ResponseError(ctx, http.StatusBadRequest, err, nil)
+		return err
+	}
+
+	user, err := s.repo.SelectUsersByPhoneNumber(ctx.Request().Context(), param.PhoneNumber)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		ctx.Logger().Error(err)
+		payloads.ResponseError(ctx, http.StatusInternalServerError, err, nil)
+		return err
+	} else if user.Id > 0 {
+		err := errors.New(strings.ToLower(http.StatusText(http.StatusConflict)))
+		payloads.ResponseError(ctx, http.StatusConflict, err, nil)
 		return err
 	}
 
 	passwordHash, err := utils.GeneratePassword(param.Password)
 	if err != nil {
 		ctx.Logger().Error(err)
+		payloads.ResponseError(ctx, http.StatusInternalServerError, err, nil)
 		return err
 	}
 
-	user, err := s.repo.InsertUsers(ctx.Request().Context(), models.User{
+	user, err = s.repo.InsertUsers(ctx.Request().Context(), models.User{
 		FullName:     param.FullName,
 		PhoneNumber:  param.PhoneNumber,
 		PasswordHash: passwordHash,
@@ -40,6 +58,7 @@ func (s *Server) PostUsers(ctx echo.Context) error {
 	})
 	if err != nil {
 		ctx.Logger().Error(err)
+		payloads.ResponseError(ctx, http.StatusInternalServerError, err, nil)
 		return err
 	}
 
@@ -48,27 +67,6 @@ func (s *Server) PostUsers(ctx echo.Context) error {
 		FullName:    user.FullName,
 		PhoneNumber: user.PhoneNumber,
 	})
-
-	return nil
-
-}
-
-// (GET /users/:id)
-func (s *Server) GetUsersId(ctx echo.Context, id int) error {
-
-	return nil
-
-}
-
-// (PUT /users/:id)
-func (s *Server) PutUsersId(ctx echo.Context, id int) error {
-
-	return nil
-
-}
-
-// (POST /users/login)
-func (s *Server) PostUsersLogin(ctx echo.Context) error {
 
 	return nil
 

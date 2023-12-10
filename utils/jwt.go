@@ -1,22 +1,51 @@
 package utils
 
 import (
+	"crypto/rsa"
 	"errors"
-	"fmt"
-	"strconv"
+	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
-func CreateJWT(userID int, signingKey string) (string, error) {
+func getPrivateKey() (*rsa.PrivateKey, error) {
 
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodRS256, &jwt.RegisteredClaims{
-		ID:        fmt.Sprint(userID),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * time.Minute)),
+	privateKey, err := os.ReadFile("../private/jwt.key")
+	if err != nil {
+		return nil, err
+	}
+
+	return jwt.ParseRSAPrivateKeyFromPEM(privateKey)
+
+}
+
+func getPublicKey() (*rsa.PublicKey, error) {
+
+	publicKey, err := os.ReadFile("../private/jwt-public.key")
+	if err != nil {
+		return nil, err
+	}
+
+	return jwt.ParseRSAPublicKeyFromPEM(publicKey)
+
+}
+
+func CreateJWT(userId int, signingKey string) (string, error) {
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+		"id":  userId,
+		"exp": jwt.NewNumericDate(time.Now().Add(30 * time.Minute)),
+		"jti": uuid.New(),
 	})
 
-	token, err := jwtToken.SignedString([]byte(signingKey))
+	privateKey, err := getPrivateKey()
+	if err != nil {
+		return "", err
+	}
+
+	token, err := jwtToken.SignedString(privateKey)
 	if err != nil {
 		return "", err
 	}
@@ -28,15 +57,19 @@ func CreateJWT(userID int, signingKey string) (string, error) {
 func ParseJWT(token string, signingKey string) (int, error) {
 
 	jwtToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		return []byte(signingKey), nil
+		if t.Method.Alg() != "RS256" {
+			return nil, errors.New("unexpected signing method")
+		}
+
+		return getPublicKey()
 	})
 	if err != nil || !jwtToken.Valid {
 		return 0, errors.New("jwt is not valid")
 	}
 
-	claims := jwtToken.Claims.(*jwt.RegisteredClaims)
-	userID, err := strconv.ParseInt(claims.ID, 0, 32)
+	claims := jwtToken.Claims.(jwt.MapClaims)
+	userId := claims["id"].(float64)
 
-	return int(userID), err
+	return int(userId), err
 
 }

@@ -3,57 +3,66 @@ package utils
 import (
 	"regexp"
 
-	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	en_translations "github.com/go-playground/validator/v10/translations/en"
+	goutil "github.com/muhammadrivaldy/go-util"
 )
 
-func ValidatorNew() *validator.Validate {
+func NewValidation() goutil.Validation {
 
-	validatorObj := validator.New()
-	validatorObj.RegisterValidation("phone-number", validateIndonesiaPhoneNumber)
-	validatorObj.RegisterValidation("password", validatePassword)
+	validation, _ := goutil.NewValidation()
+	validation.RegisterValidation(validateIndonesiaPhoneNumber, validatePassword)
+	validation.RegisterTranslation(translationIndonesiaPhoneNumber, translationPassword)
 
-	en := en.New()
-	ut := ut.New(en, en)
-	trans, _ := ut.GetTranslator("en")
-
-	en_translations.RegisterDefaultTranslations(validatorObj, trans)
-
-	translateOverride(trans, validatorObj)
-
-	return validatorObj
+	return validation
 
 }
 
-func validateIndonesiaPhoneNumber(fl validator.FieldLevel) bool {
+func validateIndonesiaPhoneNumber(v *validator.Validate) (err error) {
 
-	rgx, _ := regexp.Compile(`^\+62\d{9,12}$`)
+	err = v.RegisterValidation("phone-number", func(fl validator.FieldLevel) bool {
+		rgx, _ := regexp.Compile(`^\+62\d{9,12}$`)
+		return rgx.MatchString(fl.Field().String())
+	})
+	if err != nil {
+		return err
+	}
 
-	return rgx.MatchString(fl.Field().String())
-
-}
-
-func validatePassword(fl validator.FieldLevel) bool {
-
-	rgx, _ := regexp.Compile(`^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,64}$`)
-
-	return rgx.MatchString(fl.Field().String())
+	return nil
 
 }
 
-func translateOverride(trans ut.Translator, validatorObj *validator.Validate) {
+func validatePassword(v *validator.Validate) (err error) {
 
-	validatorObj.RegisterTranslation("phone-number", trans, func(ut ut.Translator) error {
-		return ut.Add("phone-number", "{0} format must be valid!", true) // see universal-translator for details
+	err = v.RegisterValidation("password", func(fl validator.FieldLevel) bool {
+		password := fl.Field().String()
+		return regexp.MustCompile(`[A-Z]`).MatchString(password) &&
+			regexp.MustCompile(`\d`).MatchString(password) &&
+			regexp.MustCompile(`[^A-Za-z0-9]`).MatchString(password)
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func translationIndonesiaPhoneNumber(v *validator.Validate, trans *ut.Translator) error {
+
+	return v.RegisterTranslation("phone-number", *trans, func(ut ut.Translator) error {
+		return ut.Add("phone-number", "{0} format must be valid", true) // see universal-translator for details
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, _ := ut.T("phone-number", fe.Field())
 		return t
 	})
 
-	validatorObj.RegisterTranslation("password", trans, func(ut ut.Translator) error {
-		return ut.Add("password", "{0} format must be valid!", true) // see universal-translator for details
+}
+
+func translationPassword(v *validator.Validate, trans *ut.Translator) error {
+
+	return v.RegisterTranslation("password", *trans, func(ut ut.Translator) error {
+		return ut.Add("password", "{0} format must be valid", true) // see universal-translator for details
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, _ := ut.T("password", fe.Field())
 		return t

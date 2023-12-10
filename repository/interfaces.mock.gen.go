@@ -64,3 +64,33 @@ func (mr *MockRepositoryInterfaceMockRecorder) SelectUsersById(ctx, id interface
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsersById", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectUsersById), ctx, id)
 }
+
+// SelectUsersByPhoneNumber mocks base method.
+func (m *MockRepositoryInterface) SelectUsersByPhoneNumber(ctx context.Context, phoneNumber string) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectUsersByPhoneNumber", ctx, phoneNumber)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectUsersByPhoneNumber indicates an expected call of SelectUsersByPhoneNumber.
+func (mr *MockRepositoryInterfaceMockRecorder) SelectUsersByPhoneNumber(ctx, phoneNumber interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsersByPhoneNumber", reflect.TypeOf((*MockRepositoryInterface)(nil).SelectUsersByPhoneNumber), ctx, phoneNumber)
+}
+
+// UpdateUsers mocks base method.
+func (m *MockRepositoryInterface) UpdateUsers(ctx context.Context, user models.User) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUsers", ctx, user)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateUsers indicates an expected call of UpdateUsers.
+func (mr *MockRepositoryInterfaceMockRecorder) UpdateUsers(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsers", reflect.TypeOf((*MockRepositoryInterface)(nil).UpdateUsers), ctx, user)
+}
