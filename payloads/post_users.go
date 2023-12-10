@@ -1,4 +1,4 @@
-package payload
+package payloads
 
 type RequestPostUsers struct {
 	PhoneNumber string `json:"phone_number" validate:"required,min=12,max=15"`

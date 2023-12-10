@@ -1,31 +1,42 @@
 package main
 
 import (
-	"os"
+	"fmt"
 
+	"github.com/SawitProRecruitment/UserService/configs"
 	"github.com/SawitProRecruitment/UserService/generated"
 	"github.com/SawitProRecruitment/UserService/handler"
 	"github.com/SawitProRecruitment/UserService/repository"
-
 	"github.com/labstack/echo/v4"
+	goutil "github.com/muhammadrivaldy/go-util"
 )
 
 func main() {
+
+	config := loadConfig()
 	e := echo.New()
 
-	var server generated.ServerInterface = newServer()
+	repo := repository.NewRepository(config)
+	serv := handler.NewServer(repo)
+	generated.RegisterHandlers(e, serv)
 
-	generated.RegisterHandlers(e, server)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.Port)))
+
 }
 
-func newServer() *handler.Server {
-	dbDsn := os.Getenv("DATABASE_URL")
-	var repo repository.RepositoryInterface = repository.NewRepository(repository.NewRepositoryOptions{
-		Dsn: dbDsn,
-	})
-	opts := handler.NewServerOptions{
-		Repository: repo,
+func loadConfig() configs.Configuration {
+
+	osFile, err := goutil.OpenFile("./../configs", "local.conf")
+	if err != nil {
+		panic(err)
 	}
-	return handler.NewServer(opts)
+	defer osFile.Close()
+
+	var config configs.Configuration
+	if err := goutil.Configuration(osFile, &config); err != nil {
+		panic(err)
+	}
+
+	return config
+
 }

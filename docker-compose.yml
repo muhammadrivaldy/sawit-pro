@@ -2,9 +2,11 @@ services:
   app:
     build: .
     ports:
-      - "8080:1323"
+      - "8080:8082"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/database?sslmode=disable
+      DB_ADDRESS: db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
     depends_on:
       db:
         condition: service_healthy

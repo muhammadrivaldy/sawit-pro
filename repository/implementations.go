@@ -7,13 +7,10 @@ import (
 )
 
 func (r *Repository) InsertUsers(ctx context.Context, user models.User) (models.User, error) {
-
-	return models.User{}, nil
-
+	err := r.gormDb.Create(&user).Error
+	return user, err
 }
 
 func (r *Repository) SelectUsersById(ctx context.Context, id int) (models.User, error) {
-
 	return models.User{}, nil
-
 }
