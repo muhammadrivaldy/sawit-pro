@@ -10,7 +10,7 @@ import (
 )
 
 type Repository struct {
-	gormDb *gorm.DB
+	GormDb *gorm.DB
 }
 
 func NewRepository(config configs.Configuration) RepositoryInterface {
@@ -25,6 +25,6 @@ func NewRepository(config configs.Configuration) RepositoryInterface {
 		panic(err)
 	}
 
-	return &Repository{gormDb: gormDb}
+	return &Repository{GormDb: gormDb}
 
 }
