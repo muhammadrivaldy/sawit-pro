@@ -16,10 +16,10 @@ func main() {
 
 	conf := loadConfig()
 	e := echo.New()
-	e.Use(utils.ValidateToken(conf))
+	e.Use(utils.ValidateToken)
 
 	repo := repository.NewRepository(conf)
-	serv := handler.NewServer(conf, repo)
+	serv := handler.NewServer(repo)
 	generated.RegisterHandlers(e, serv)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", conf.Port)))

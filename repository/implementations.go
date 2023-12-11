@@ -25,3 +25,8 @@ func (r *Repository) SelectUsersByPhoneNumber(ctx context.Context, phoneNumber s
 	err = r.GormDb.Where("phone_number = ?", phoneNumber).First(&user).Error
 	return user, err
 }
+
+func (r *Repository) InsertSessions(ctx context.Context, session models.Session) (models.Session, error) {
+	err := r.GormDb.Create(&session).Error
+	return session, err
+}

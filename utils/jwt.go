@@ -32,7 +32,7 @@ func getPublicKey() (*rsa.PublicKey, error) {
 
 }
 
-func CreateJWT(userId int, signingKey string) (string, error) {
+func CreateJWT(userId int) (string, error) {
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"id":  userId,
@@ -54,7 +54,7 @@ func CreateJWT(userId int, signingKey string) (string, error) {
 
 }
 
-func ParseJWT(token string, signingKey string) (int, error) {
+func ParseJWT(token string) (int, error) {
 
 	jwtToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if t.Method.Alg() != "RS256" {

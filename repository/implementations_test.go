@@ -58,12 +58,12 @@ func TestInsertUsersSuccess(t *testing.T) {
 
 	_, err := repo.InsertUsers(context.TODO(), user)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }
@@ -90,7 +90,7 @@ func TestInsertUsersFailed(t *testing.T) {
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }
@@ -112,12 +112,12 @@ func TestUpdateUsersSuccess(t *testing.T) {
 
 	_, err := repo.UpdateUsers(context.TODO(), user)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }
@@ -142,7 +142,7 @@ func TestUpdateUsersFailed(t *testing.T) {
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }
@@ -158,12 +158,12 @@ func TestSelectUsersByIdSuccess(t *testing.T) {
 
 	_, err := repo.SelectUsersById(context.TODO(), 123)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }
@@ -178,7 +178,7 @@ func TestSelectUsersByIdFailed(t *testing.T) {
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }
@@ -194,12 +194,12 @@ func TestSelectUsersByPhoneNumberSuccess(t *testing.T) {
 
 	_, err := repo.SelectUsersByPhoneNumber(context.TODO(), "+6287789312891")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 }
@@ -214,7 +214,57 @@ func TestSelectUsersByPhoneNumberFailed(t *testing.T) {
 
 	err = mock.ExpectationsWereMet()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
+	}
+
+}
+
+func TestInsertSessionsSuccess(t *testing.T) {
+
+	session := models.Session{
+		Id:      123,
+		UserId:  123,
+		LoginAt: time.Now(),
+	}
+
+	mock.ExpectBegin()
+	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "trx_sessions" ("user_id","login_at","id") VALUES ($1,$2,$3) RETURNING "id"`)).
+		WithArgs(session.UserId, sqlmock.AnyArg(), session.Id).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectCommit()
+
+	_, err := repo.InsertSessions(context.TODO(), session)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+}
+
+func TestInsertSessionsFailed(t *testing.T) {
+
+	session := models.Session{
+		Id:      123,
+		UserId:  123,
+		LoginAt: time.Now(),
+	}
+
+	mock.ExpectBegin()
+	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "trx_sessions" ("user_id","login_at","id") VALUES ($1,$2,$3) RETURNING "id"`)).
+		WithArgs(session.UserId, sqlmock.AnyArg(), session.Id).
+		WillReturnError(gorm.ErrRecordNotFound)
+	mock.ExpectRollback()
+
+	_, err := repo.InsertSessions(context.TODO(), session)
+	assert.Equal(t, gorm.ErrRecordNotFound, err)
+
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 }

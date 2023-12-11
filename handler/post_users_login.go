@@ -47,7 +47,7 @@ func (s *Server) PostUsersLogin(ctx echo.Context) error {
 		return err
 	}
 
-	token, err := utils.CreateJWT(user.Id, s.conf.JWTKey)
+	token, err := utils.CreateJWT(user.Id)
 	if err != nil {
 		ctx.Logger().Error(err)
 		payloads.ResponseError(ctx, http.StatusInternalServerError, err, nil)

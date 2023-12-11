@@ -1,7 +1,7 @@
 # Dockerfile definition for Backend application service.
 
 # From which image we want to build. This is basically our environment.
-FROM golang:1.21.5-alpine as Build
+FROM golang:1.19-alpine as Build
 
 WORKDIR /src/app
 

@@ -11,8 +11,16 @@ import (
 )
 
 type RepositoryInterface interface {
+	UsersRepositoryInterface
+}
+
+type UsersRepositoryInterface interface {
 	InsertUsers(ctx context.Context, user models.User) (models.User, error)
 	UpdateUsers(ctx context.Context, user models.User) (models.User, error)
 	SelectUsersById(ctx context.Context, id int) (models.User, error)
 	SelectUsersByPhoneNumber(ctx context.Context, phoneNumber string) (models.User, error)
+}
+
+type SessionRepositoryInterface interface {
+	InsertSessions(ctx context.Context, session models.Session) (models.Session, error)
 }

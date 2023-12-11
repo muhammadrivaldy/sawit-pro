@@ -5,44 +5,39 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SawitProRecruitment/UserService/configs"
 	"github.com/SawitProRecruitment/UserService/payloads"
 	"github.com/labstack/echo/v4"
 )
 
-func ValidateToken(conf configs.Configuration) func(next echo.HandlerFunc) echo.HandlerFunc {
+func ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
 
-		return func(ctx echo.Context) error {
-
-			if isPublicEndpoint(ctx) {
-				return next(ctx)
-			}
-
-			// get value authorization from header
-			authorization := ctx.Request().Header.Get("authorization")
-			if ok := strings.Contains(authorization, "Bearer "); !ok {
-				err := errors.New(strings.ToLower(http.StatusText(http.StatusUnauthorized)))
-				payloads.ResponseError(ctx, http.StatusUnauthorized, err, nil)
-				return err
-			}
-
-			// split value without bearer
-			authorization = strings.Split(authorization, "Bearer ")[1]
-
-			userId, err := ParseJWT(authorization, conf.JWTKey)
-			if err != nil {
-				err := errors.New(strings.ToLower(http.StatusText(http.StatusUnauthorized)))
-				payloads.ResponseError(ctx, http.StatusUnauthorized, err, nil)
-				return err
-			}
-
-			ctx.Set("user-id", userId)
-
+		if isPublicEndpoint(ctx) {
 			return next(ctx)
-
 		}
+
+		// get value authorization from header
+		authorization := ctx.Request().Header.Get("authorization")
+		if ok := strings.Contains(authorization, "Bearer "); !ok {
+			err := errors.New(strings.ToLower(http.StatusText(http.StatusUnauthorized)))
+			payloads.ResponseError(ctx, http.StatusUnauthorized, err, nil)
+			return err
+		}
+
+		// split value without bearer
+		authorization = strings.Split(authorization, "Bearer ")[1]
+
+		userId, err := ParseJWT(authorization)
+		if err != nil {
+			err := errors.New(strings.ToLower(http.StatusText(http.StatusUnauthorized)))
+			payloads.ResponseError(ctx, http.StatusUnauthorized, err, nil)
+			return err
+		}
+
+		ctx.Set("user-id", userId)
+
+		return next(ctx)
 
 	}
 
