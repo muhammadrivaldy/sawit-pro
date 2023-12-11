@@ -3,7 +3,9 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"time"
 
+	"github.com/SawitProRecruitment/UserService/models"
 	"github.com/SawitProRecruitment/UserService/payloads"
 	"github.com/SawitProRecruitment/UserService/utils"
 	"github.com/labstack/echo/v4"
@@ -52,6 +54,14 @@ func (s *Server) PostUsersLogin(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		payloads.ResponseError(ctx, http.StatusInternalServerError, err, nil)
 		return err
+	}
+
+	_, err = s.repo.InsertSessions(ctx.Request().Context(), models.Session{
+		UserId:  user.Id,
+		LoginAt: time.Now(),
+	})
+	if err != nil {
+		ctx.Logger().Error(err) // if error happened, just log the error and don't break the user journey because this isn't important
 	}
 
 	payloads.ResponseOK(ctx, http.StatusOK, payloads.ResponsePostUsersLogin{

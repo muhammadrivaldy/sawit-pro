@@ -35,6 +35,21 @@ func (m *MockRepositoryInterface) EXPECT() *MockRepositoryInterfaceMockRecorder 
 	return m.recorder
 }
 
+// InsertSessions mocks base method.
+func (m *MockRepositoryInterface) InsertSessions(ctx context.Context, session models.Session) (models.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertSessions", ctx, session)
+	ret0, _ := ret[0].(models.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertSessions indicates an expected call of InsertSessions.
+func (mr *MockRepositoryInterfaceMockRecorder) InsertSessions(ctx, session interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertSessions", reflect.TypeOf((*MockRepositoryInterface)(nil).InsertSessions), ctx, session)
+}
+
 // InsertUsers mocks base method.
 func (m *MockRepositoryInterface) InsertUsers(ctx context.Context, user models.User) (models.User, error) {
 	m.ctrl.T.Helper()
@@ -93,4 +108,125 @@ func (m *MockRepositoryInterface) UpdateUsers(ctx context.Context, user models.U
 func (mr *MockRepositoryInterfaceMockRecorder) UpdateUsers(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsers", reflect.TypeOf((*MockRepositoryInterface)(nil).UpdateUsers), ctx, user)
+}
+
+// MockUsersRepositoryInterface is a mock of UsersRepositoryInterface interface.
+type MockUsersRepositoryInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockUsersRepositoryInterfaceMockRecorder
+}
+
+// MockUsersRepositoryInterfaceMockRecorder is the mock recorder for MockUsersRepositoryInterface.
+type MockUsersRepositoryInterfaceMockRecorder struct {
+	mock *MockUsersRepositoryInterface
+}
+
+// NewMockUsersRepositoryInterface creates a new mock instance.
+func NewMockUsersRepositoryInterface(ctrl *gomock.Controller) *MockUsersRepositoryInterface {
+	mock := &MockUsersRepositoryInterface{ctrl: ctrl}
+	mock.recorder = &MockUsersRepositoryInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUsersRepositoryInterface) EXPECT() *MockUsersRepositoryInterfaceMockRecorder {
+	return m.recorder
+}
+
+// InsertUsers mocks base method.
+func (m *MockUsersRepositoryInterface) InsertUsers(ctx context.Context, user models.User) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertUsers", ctx, user)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertUsers indicates an expected call of InsertUsers.
+func (mr *MockUsersRepositoryInterfaceMockRecorder) InsertUsers(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUsers", reflect.TypeOf((*MockUsersRepositoryInterface)(nil).InsertUsers), ctx, user)
+}
+
+// SelectUsersById mocks base method.
+func (m *MockUsersRepositoryInterface) SelectUsersById(ctx context.Context, id int) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectUsersById", ctx, id)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectUsersById indicates an expected call of SelectUsersById.
+func (mr *MockUsersRepositoryInterfaceMockRecorder) SelectUsersById(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsersById", reflect.TypeOf((*MockUsersRepositoryInterface)(nil).SelectUsersById), ctx, id)
+}
+
+// SelectUsersByPhoneNumber mocks base method.
+func (m *MockUsersRepositoryInterface) SelectUsersByPhoneNumber(ctx context.Context, phoneNumber string) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectUsersByPhoneNumber", ctx, phoneNumber)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectUsersByPhoneNumber indicates an expected call of SelectUsersByPhoneNumber.
+func (mr *MockUsersRepositoryInterfaceMockRecorder) SelectUsersByPhoneNumber(ctx, phoneNumber interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsersByPhoneNumber", reflect.TypeOf((*MockUsersRepositoryInterface)(nil).SelectUsersByPhoneNumber), ctx, phoneNumber)
+}
+
+// UpdateUsers mocks base method.
+func (m *MockUsersRepositoryInterface) UpdateUsers(ctx context.Context, user models.User) (models.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUsers", ctx, user)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateUsers indicates an expected call of UpdateUsers.
+func (mr *MockUsersRepositoryInterfaceMockRecorder) UpdateUsers(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsers", reflect.TypeOf((*MockUsersRepositoryInterface)(nil).UpdateUsers), ctx, user)
+}
+
+// MockSessionRepositoryInterface is a mock of SessionRepositoryInterface interface.
+type MockSessionRepositoryInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockSessionRepositoryInterfaceMockRecorder
+}
+
+// MockSessionRepositoryInterfaceMockRecorder is the mock recorder for MockSessionRepositoryInterface.
+type MockSessionRepositoryInterfaceMockRecorder struct {
+	mock *MockSessionRepositoryInterface
+}
+
+// NewMockSessionRepositoryInterface creates a new mock instance.
+func NewMockSessionRepositoryInterface(ctrl *gomock.Controller) *MockSessionRepositoryInterface {
+	mock := &MockSessionRepositoryInterface{ctrl: ctrl}
+	mock.recorder = &MockSessionRepositoryInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSessionRepositoryInterface) EXPECT() *MockSessionRepositoryInterfaceMockRecorder {
+	return m.recorder
+}
+
+// InsertSessions mocks base method.
+func (m *MockSessionRepositoryInterface) InsertSessions(ctx context.Context, session models.Session) (models.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertSessions", ctx, session)
+	ret0, _ := ret[0].(models.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertSessions indicates an expected call of InsertSessions.
+func (mr *MockSessionRepositoryInterfaceMockRecorder) InsertSessions(ctx, session interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertSessions", reflect.TypeOf((*MockSessionRepositoryInterface)(nil).InsertSessions), ctx, session)
 }

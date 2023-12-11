@@ -12,6 +12,7 @@ import (
 
 type RepositoryInterface interface {
 	UsersRepositoryInterface
+	SessionRepositoryInterface
 }
 
 type UsersRepositoryInterface interface {

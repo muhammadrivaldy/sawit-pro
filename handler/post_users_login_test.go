@@ -39,6 +39,60 @@ func TestPostUsersLoginSuccess(t *testing.T) {
 		SelectUsersByPhoneNumber(gomock.Any(), "+62812283910041").
 		Times(1).Return(user, nil)
 
+	repo.EXPECT().
+		InsertSessions(gomock.Any(), gomock.Any()).
+		Times(1).Return(models.Session{}, nil)
+
+	serv := handler.NewServer(repo)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.SetBasicAuth("+62812283910041", "hahi37#A")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	err := serv.PostUsersLogin(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	response := payloads.Response{}
+	json.Unmarshal(rec.Body.Bytes(), &response)
+	responseData := response.Data.(map[string]interface{})
+	userId, err := utils.ParseJWT(responseData["token"].(string))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, user.Id, userId)
+
+}
+
+func TestPostUsersLoginSuccessButInsertSessionGotUnexpectedError(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := repository.NewMockRepositoryInterface(ctrl)
+
+	user := models.User{
+		Id:           123,
+		FullName:     "Rival",
+		PhoneNumber:  "+6287789312891",
+		PasswordHash: "$2a$10$MXWbKFotaINb8seF5ybpPu1V43r4MxPXtjseSzsJbUbT8q7qAT2j2",
+		CreatedBy:    123,
+		CreatedAt:    time.Now(),
+	}
+
+	repo.EXPECT().
+		SelectUsersByPhoneNumber(gomock.Any(), "+62812283910041").
+		Times(1).Return(user, nil)
+
+	repo.EXPECT().
+		InsertSessions(gomock.Any(), gomock.Any()).
+		Times(1).Return(models.Session{}, errors.New("unexpected error"))
+
 	serv := handler.NewServer(repo)
 
 	e := echo.New()
